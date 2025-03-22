@@ -4,18 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dark Knight | Access</title>
-
-    <!-- Manifest for PWA -->
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICAgIm5hbWUiOiAiRGFyayBLaW5naHQgQWNjZXNzIiwKICAgICJzaG9ydF9uYW1lIjogIkRhcmsgS2luaWdodCIsCiAgICAic3RhcnRfdXJsIjogImluZGV4Lmh0bWwiLAogICAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAgICJ0aGVtZV9jb2xvciI6ICIjMDBmZjAwIiwKICAgICJpY29ucyI6IFsKICAgICAgICB7CiAgICAgICAgICAgICJzcmMiOiAiaWNvbi5wbmciLAogICAgICAgICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgICAgICB9CiAgICBdCn0=">
-
-    <!-- Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHsKICAgIGNvbnNvbGUubG9nKCJTZXJ2aWNlIFdvcmtlciBJbnN0YWxsZWQiKTsKfSk7CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZnVuY3Rpb24oZXZlbnQpIHsKICAgIGNvbnNvbGUubG9nKCJGZXRjaGluZzogIiwgZXZlbnQucmVxdWVzdC51cmwpOwp9KTs=')
-            .then(() => console.log("Service Worker Registered"));
-        }
-    </script>
-
     <style>
         /* Basic Settings */
         body {
@@ -25,6 +13,16 @@
             text-align: center;
             margin: 0;
             overflow-x: hidden;
+        }
+
+        /* Matrix Canvas */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
 
         /* Main Container */
@@ -74,6 +72,13 @@
             color: black;
         }
 
+        /* Error Message */
+        .error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+
         /* Hidden Options */
         .options {
             display: none;
@@ -82,6 +87,7 @@
     </style>
 </head>
 <body>
+    <canvas id="matrix"></canvas>
     
     <div class="container" id="loginContainer">
         <h2>🔒 Access Portal</h2>
@@ -90,7 +96,7 @@
             <input type="password" id="key" placeholder="Enter Key" required>
             <button type="submit" class="button">Continue</button>
         </form>
-        <p class="error" id="errorMsg" style="color: red; display: none;">❌ Invalid Username or Key!</p>
+        <p class="error" id="errorMsg">❌ Invalid Username or Key!</p>
     </div>
 
     <!-- Options after successful login -->
@@ -113,6 +119,39 @@
                 document.getElementById("errorMsg").style.display = "block";
             }
         });
+
+        // Matrix Effect
+        var canvas = document.getElementById("matrix");
+        var ctx = canvas.getContext("2d");
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        var text = "Dark Knight Team ";
+        var columns = Math.floor(canvas.width / 20);
+        var drops = new Array(columns).fill(1);
+
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00ff00";
+            ctx.font = "16px Courier New";
+
+            for (var i = 0; i < drops.length; i++) {
+                var char = text[Math.floor(Math.random() * text.length)];
+                ctx.fillText(char, i * 20, drops[i] * 20);
+                
+                if (drops[i] * 20 > canvas.height && Math.random() > 0.98) 
+                    drops[i] = 0;
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 35);
     </script>
 </body>
 </html>
